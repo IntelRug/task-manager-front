@@ -1,0 +1,347 @@
+@import 'variables';
+@import 'fonts';
+
+
+* {
+	box-sizing: border-box;
+	word-wrap: break-word;
+}
+
+html {
+	font-size: 10px;
+}
+
+body {
+	background: $q-color;
+	color: $u-color;
+	margin: 0;
+	padding: 0;
+	font-size: 14px;
+	font-family: "Segoe UI", -apple-system, system-ui, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+	-webkit-font-smoothing: subpixel-antialiased;
+	overflow: hidden;
+}
+
+.img {
+	width: 100%;
+	min-height: 100%;
+}
+
+input {
+	outline: 0;
+}
+
+ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+p {
+	margin: 0;
+	padding: 0;
+}
+
+.clearfix:after {
+	content:'';
+	display: table;
+	width: 100%;
+	clear: both;
+}
+
+.no-select {
+	-ms-user-select: none;
+	user-select: none;
+	-o-user-select: none;
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none
+}
+
+
+.button {
+	display: inline-block;
+	text-align: center;
+	vertical-align: middle;
+	user-select: none;
+	outline: none;
+}
+
+.hidden-text {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.hidden-block {
+	display: none!important;
+	opacity: 0!important;
+	position: absolute!important;
+	left: -9999px!important;
+	height: 0!important;
+	width: 0!important;
+	overflow: hidden!important;
+}
+
+.material-block {
+	background: $o-color;
+}
+
+.main-content {
+	.content-page {
+		.content__header-panel {
+			background: $e-color;
+		    height: 50px;
+		    position: relative;
+		    display: flex;
+		    align-items: center;
+		    position: absolute;
+		    top: 0;
+		    right: 0;
+		    left: 0;
+		    z-index: 100;
+		}
+		.main-page {
+			width: 100vw;
+			height: 100vh;
+			position: relative;
+			padding-top: 55px;
+			display: flex;
+			margin-bottom: 10px;
+		}
+		.main-page__menu {
+			flex: none;
+		}
+		.main-page__menu_left {
+			width: 250px;
+			margin-left: 10px;
+			.left-menu__block {
+				margin-bottom: 30px;
+			}
+			.left-menu__block-header {
+				padding: 10px;
+				color: $e-color;
+				margin-bottom: 5px;
+			}
+			.left-menu__block-item {
+				padding: 10px 20px;
+				background: $o-color;
+				border-bottom: 1px solid $q-color;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				&:last-child {
+					border-bottom: none;
+				}
+				&:hover {
+					background: $a-color;
+				}
+			}
+		}
+		.main-page__menu_right {
+			width: 380px;
+			margin-right: 10px;
+		}
+		.main-page__container {
+			margin: 0 16px;
+			width: 100%;
+		}
+		.main-page__task-list {
+			height: 100%;		
+			.task-list__header {
+				height: 34px;
+				display: flex;
+				align-items: center;
+				margin-bottom: 5px;
+			}
+			.task-list__header-create {
+				height: 100%;
+				background: $w-color;
+				color: $o-color;
+				padding: 7px 30px;
+				margin-right: auto;
+				cursor: pointer;
+			}
+			.task-list__header-sort {
+				width: 181px;
+				height: 100%;
+				padding: 7px 0px;
+				text-align: center;
+				margin: 0 0 0 20px;
+				z-index: 1;
+				cursor: pointer;
+			}
+			.header-sort__list {
+				background: white;
+				width: 190px;
+				margin-top: 8px;
+				box-shadow: 0 3px 3px 0px #98989845;
+				margin-left: -0.9rem;
+				
+			}
+			.header-sort__list-item {
+				padding: 7px 10px;
+				transition: all 0.3s ease;
+				text-align: left;
+				&.active {
+					background: $a-color;
+				}
+				&:hover {
+					background: $a-color;
+				}
+			}
+			.task-list__content {
+				height: 100%;
+				overflow-y: auto;
+			}
+			.task-list__task-item {
+			    display: flex;
+			    align-items: center;
+			    border-bottom: 1px solid $q-color;
+			    cursor: pointer;
+			    //padding: 10px 0;
+			    &.select, &:hover {								
+					.task-item__favorites, .task-item__name, .task-item__author {
+						transition: all 0.3s ease;
+						background: $e-color;
+						color: $o-color;
+					}
+			    }
+			}
+
+			.task-item__favorites {
+			    width: 50px;
+			    text-align: center;
+			    height: 100%;
+			    padding: 10px 0;
+			    cursor: pointer;
+			    i.select {
+			    	font-weight: 900;
+			    	color: $w-color;
+			    } 
+			}
+
+			.task-item__name {
+			    flex: 1;
+			    padding: 10px 0;
+			}
+
+			.task-item__status {
+			    width: 200px;
+			    width: 11vw;
+			    min-width: 140px;
+			    text-align: center;
+			    //border-left: 1px solid #707070;
+			    //border-right: 1px solid #707070;
+			    padding: 10px 0;
+			    &.inwork {
+					background: transparentize(#FF7E00, 0.9);
+			    }
+			    &.completed {
+					background: transparentize(#00FF39, 0.9);
+			    }
+			    &.new {
+					background: transparentize(#FFFF00, 0.9);
+			    }
+			    &.verifying {
+			    	background: transparentize(#1EC1FF, 0.9);
+			    }
+			}
+
+			.task-item__author {
+			    width: 500px;
+			    width: 27vw;
+			    text-align: center;
+			    padding: 10px 0;
+			}
+		}
+		.control-tasks {
+			height: 100%;
+		}
+		.control-tasks__header {
+			height: 50px;
+			line-height: 50px;
+			padding: 0 40px;
+			border-bottom: 2px solid $t-color;
+			margin-bottom: 20px;
+		}
+		.control-tasks__button {
+			height: 50px;
+			line-height: 50px;
+			padding: 0 40px;
+			color: $t-color;
+			border-bottom: 1px solid $q-color;
+			cursor: pointer;
+			transition: all .3s ease;
+			&:hover {
+				background: $q-color;
+			}
+			&:first-child {
+				border-top: 1px solid $q-color;
+			}
+		}
+		.control-tasks__comments {
+			height: 100%;
+		}
+		.control-tasks__comments-title {
+			text-align: center;
+			font-size: 10px;
+			color: $t-color;
+			margin-top: 5px;
+		}
+		.control-tasks__comments-content {
+			margin-top: 20px;
+			padding: 0 17px;
+		}
+		.control-tasks__comment-item {
+			display: flex;
+			align-items: flex-end;
+			margin-bottom: 20px;
+			//&:last-child {
+				//margin-bottom: 0;
+			//}
+		}
+		.comment-item__img {
+			width: 50px;
+			height: 50px;
+			border-radius: 50%;
+			flex: none;
+			margin-right: 14px;
+		}
+		.comment-item__content {
+			flex: 1;
+		}
+		.comment-item__header {
+			display: flex;
+			align-items: center;
+		}
+		.comment-item__header-name {
+			flex: 1;
+		}
+		.comment-item__text {
+			border: 1px solid $t-color;
+			border-radius: 10px;
+			min-height: 56px;
+			padding: 4px 8px;
+			margin-top: 5px;
+		}
+		.control-tasks__comment-time {
+			color: $t-color;
+			text-align: right;
+			margin-bottom: 10px;
+		}
+		.control-tasks__comments-footer {
+			border-top: 1px solid $t-color;
+			border-bottom: 1px solid $t-color;
+			padding: 10px;
+		}
+		.control-tasks__comments-input {
+			height: 62px;
+			width: 100%;
+			border: 1px solid $t-color;
+			padding: 6px 10px;
+			resize: none;
+		}
+	}
+}
+
+@import 'media'; 
