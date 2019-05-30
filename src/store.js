@@ -7,6 +7,7 @@ export default new Vuex.Store({
   state: {
     lists: [],
     tasks: [],
+    users: [],
   },
   getters: {
     tasks(state) {
@@ -35,6 +36,20 @@ export default new Vuex.Store({
         const list = state.lists.find(t => t.id === id);
         if (!list) return {};
         return list;
+      };
+    },
+    users(state) {
+      Vue.set(state, 'users', state.users || []);
+      return state.users;
+    },
+    user(state) {
+      return (id) => {
+        if (!state.users || !Array.isArray(state.users)) {
+          return {};
+        }
+        const user = state.users.find(u => u.id === id);
+        if (!user) return {};
+        return user;
       };
     },
   },
@@ -68,6 +83,22 @@ export default new Vuex.Store({
           Vue.set(state.lists, tId, list);
         } else {
           state.lists.push(list);
+        }
+      });
+    },
+    SET_USERS(state, users = []) {
+      Vue.set(state, 'users', users);
+    },
+    ADD_USERS(state, users) {
+      if (!users || !Array.isArray(users)) return;
+      Vue.set(state, 'users', state.users || []);
+      users.forEach((user) => {
+        const uId = state.users.findIndex(({ id }) => (id === user.id));
+
+        if (uId !== -1) {
+          Vue.set(state.users, uId, user);
+        } else {
+          state.lists.push(user);
         }
       });
     },
@@ -112,7 +143,6 @@ export default new Vuex.Store({
         console.log(e);
       }
     },
-
     async CREATE_LIST({ commit }) {
       try {
         const { data } = await Vue.API.post('lists', {
@@ -123,7 +153,6 @@ export default new Vuex.Store({
         console.log(e);
       }
     },
-
     async REMOVE_LIST({ commit }, { id, moveTo }) {
       try {
         const options = moveTo !== -1 ? { move_to: moveTo } : {};
@@ -133,11 +162,26 @@ export default new Vuex.Store({
         console.log(e);
       }
     },
-
     async EDIT_LIST({ commit }, { id, options = {} }) {
       try {
         const { data } = await Vue.API.put(`lists/${id}`, options);
         commit('ADD_LISTS', [data.list]);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async GET_USERS({ commit }) {
+      try {
+        const { data } = await Vue.API.get('users');
+        commit('SET_USERS', data.users);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async GET_USER({ commit }, id) {
+      try {
+        const { data } = await Vue.API.get(`users/${id}`);
+        commit('ADD_USERS', [data.user]);
       } catch (e) {
         console.log(e);
       }
