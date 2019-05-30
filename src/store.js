@@ -5,6 +5,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    lists: [],
     tasks: [],
   },
   getters: {
@@ -20,6 +21,20 @@ export default new Vuex.Store({
         const task = state.tasks.find(t => t.id === id);
         if (!task) return {};
         return task;
+      };
+    },
+    lists(state) {
+      Vue.set(state, 'lists', state.lists || []);
+      return state.lists;
+    },
+    list(state) {
+      return (id) => {
+        if (!state.lists || !Array.isArray(state.lists)) {
+          return {};
+        }
+        const list = state.lists.find(t => t.id === id);
+        if (!list) return {};
+        return list;
       };
     },
   },
@@ -40,11 +55,34 @@ export default new Vuex.Store({
         }
       });
     },
+    SET_LISTS(state, lists = []) {
+      Vue.set(state, 'lists', lists);
+    },
+    ADD_LISTS(state, lists) {
+      if (!lists || !Array.isArray(lists)) return;
+      Vue.set(state, 'lists', state.lists || []);
+      lists.forEach((list) => {
+        const tId = state.lists.findIndex(({ id }) => (id === list.id));
+
+        if (tId !== -1) {
+          Vue.set(state.lists, tId, list);
+        } else {
+          state.lists.push(list);
+        }
+      });
+    },
+    REMOVE_LIST(state, id) {
+      Vue.set(state, 'lists', state.lists || []);
+      const index = state.lists.findIndex(l => l.id === id);
+      if (index !== -1) {
+        state.lists.splice(index, 1);
+      }
+    },
   },
   actions: {
-    async GET_TASKS({ commit }) {
+    async GET_TASKS({ commit }, options) {
       try {
-        const { data } = await Vue.API.get('tasks');
+        const { data } = await Vue.API.get('tasks', options);
         commit('SET_TASKS', data.tasks);
       } catch (e) {
         console.log(e);
@@ -54,6 +92,52 @@ export default new Vuex.Store({
       try {
         const { data } = await Vue.API.get(`tasks/${id}`);
         commit('ADD_TASKS', [data.task]);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async GET_LISTS({ commit }) {
+      try {
+        const { data } = await Vue.API.get('lists');
+        commit('SET_LISTS', data.lists);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async GET_LIST({ commit }, id) {
+      try {
+        const { data } = await Vue.API.get(`lists/${id}`);
+        commit('ADD_LISTS', [data.list]);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+
+    async CREATE_LIST({ commit }) {
+      try {
+        const { data } = await Vue.API.post('lists', {
+          name: 'Новый список',
+        });
+        commit('ADD_LISTS', [data.list]);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+
+    async REMOVE_LIST({ commit }, { id, moveTo }) {
+      try {
+        const options = moveTo !== -1 ? { move_to: moveTo } : {};
+        await Vue.API.delete(`lists/${id}`, options);
+        commit('REMOVE_LIST', id);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+
+    async EDIT_LIST({ commit }, { id, options = {} }) {
+      try {
+        const { data } = await Vue.API.put(`lists/${id}`, options);
+        commit('ADD_LISTS', [data.list]);
       } catch (e) {
         console.log(e);
       }

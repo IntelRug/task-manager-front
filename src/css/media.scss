@@ -27,7 +27,13 @@
 }
 
 @media (max-width: 1350px) {
+	.section-img {
+		width: 300px;
+	}
 
+	.section-about {
+		margin: 0 55px;
+	}
 }
 
 @media (max-width: 1300px) {
@@ -51,7 +57,13 @@
 }
 
 @media (max-width: 1023px) {
-
+	.h3 {
+		font-size: 18px;
+		margin: 0 0 12px 0
+	}
+	.section-text {
+		font-size: 16px;
+	}
 }
 
 @media (max-width: 991px) {
