@@ -2,14 +2,16 @@
   <div class="main-page__container">
     <div class="main-page__task-list">
       <div class="task-list__header material-block">
-        <div class="task-list__header-create no-select">Создать задачу</div>
+        <router-link :to="`/lists/${listId()}/tasks/create`"
+                     tag="div"
+                     class="task-list__header-create no-select">Создать задачу</router-link>
         <div class="task-list__header-sort no-select"
-             v-on:click="triggerSort">
+             v-on:click="toggleSort">
           <span v-html="sortHtmlCurrent"></span>
           <div v-if="sortOpened" class="header-sort__list">
             <div v-for="n in sortHtmlAll.length"
                  :key="n"
-                 v-on:click="sort(n - 1)"
+                 v-on:click="sortType = n - 1"
                  v-html="sortHtmlAll[n - 1]"
                  class="header-sort__list-item"></div>
           </div>
@@ -17,7 +19,7 @@
       </div>
       <div class="task-list__content material-block">
         <ul class="task-list__task-items">
-          <router-link tag="li" :to="taskLink(task)" v-for="task in tasks" :key="task.id"
+          <router-link tag="li" :to="taskLink(task)" v-for="task in sortedTasks" :key="task.id"
                        class="task-list__task-item">
             <div
               class="task-item__favorites no-select">
@@ -60,15 +62,19 @@ export default {
     });
     next();
   },
-  watch: {
-    sortType() {
-      this.sort(this.sortType);
-    },
+  beforeRouteLeave(to, from, next) {
+    this.$store.dispatch('GET_TASKS', {
+      list_id: this.listId(to.params),
+    });
+    next();
   },
   computed: {
     ...mapGetters(['tasks']),
     listId() {
       return paramInt('listId', this.$route.params);
+    },
+    sortedTasks() {
+      return this.sort(this.tasks);
     },
     taskStatus() {
       return ({ status }) => {
@@ -98,29 +104,35 @@ export default {
         ? `/lists/${this.listId()}` : `/lists/${this.listId()}/tasks/${id}`);
     },
     taskExecutorsString() {
-      return ({ executors }) => executors.map(e => `${e.first_name} ${e.last_name}`).join(', ');
+      return ({ executors }) => {
+        if (Array.isArray(executors) && executors.length > 0) {
+          return executors.map(e => `${e.first_name} ${e.last_name}`).join(', ');
+        }
+        return 'Нет исполнителей';
+      };
     },
   },
   methods: {
-    sort(type) {
-      this.sortType = type;
-      switch (type) {
+    sort(tasks = []) {
+      let sortedTasks = [];
+      switch (this.sortType) {
         case 0:
-          this.tasks.sort((a, b) => (a.name < b.name ? 1 : -1));
+          sortedTasks = tasks.slice().sort((a, b) => (a.name < b.name ? 1 : -1));
           break;
         case 1:
-          this.tasks.sort((a, b) => (a.name > b.name ? 1 : -1));
+          sortedTasks = tasks.slice().sort((a, b) => (a.name > b.name ? 1 : -1));
           break;
         case 2:
-          this.tasks.sort((a, b) => (a.created_at > b.created_at ? 1 : -1));
+          sortedTasks = tasks.slice().sort((a, b) => (a.created_at > b.created_at ? 1 : -1));
           break;
         case 3:
-          this.tasks.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+          sortedTasks = tasks.slice().sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
           break;
         default:
       }
+      return sortedTasks;
     },
-    triggerSort() {
+    toggleSort() {
       this.sortOpened = !this.sortOpened;
     },
   },
@@ -129,7 +141,7 @@ export default {
       list_id: this.listId(),
     });
     await this.$nextTick();
-    this.sort(this.sortType);
+    this.sort(this.tasks);
   },
 };
 </script>
