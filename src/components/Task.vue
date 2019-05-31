@@ -246,15 +246,26 @@ export default {
     },
     async save() {
       if (this.task.id !== -1) {
+        let lastIdDiffers = false;
         const options = {};
         if (this.name !== this.task.name)options.name = this.name;
         if (this.description !== this.task.description) options.description = this.description;
         if (this.status !== this.task.status) options.status = this.status;
-        if (this.listIndex !== this.task.list_id) options.list_id = this.listIndex;
+        if (this.listIndex !== this.task.list_id) {
+          options.list_id = this.listIndex;
+          lastIdDiffers = true;
+        }
         if (this.deadlineAt !== this.task.deadline_at) options.deadline_at = this.deadlineAt;
         if (this.important !== this.task.important) options.important = this.important ? 1 : 0;
-        this.$store.dispatch('SET_TASK_EXECUTORS', { id: this.task.id, ids: this.executorsIdsString });
-        this.$store.dispatch('EDIT_TASK', { id: this.task.id, options });
+        await Promise.all([
+          this.$store.dispatch('SET_TASK_EXECUTORS', { id: this.task.id, ids: this.executorsIdsString }),
+          this.$store.dispatch('EDIT_TASK', { id: this.task.id, options }),
+        ]);
+        if (lastIdDiffers) {
+          await this.$store.dispatch('GET_TASKS', {
+            list_id: this.listId(),
+          });
+        }
       } else {
         const options = {
           name: this.name,
