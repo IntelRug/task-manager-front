@@ -12,28 +12,30 @@
         <li v-for="list in lists"
             :key="list.id"
             class="left-menu__block-item"
-            :class="{edit: renamingId !== -1}">
-          <input v-if="renamingId === list.id"
-                 v-model="renamingText"
-                 type="text"
-                 class="left-menu__block-item__input">
-          <router-link v-else
-                :to="`/lists/${list.id}`"
-                tag="span"
-                class="left-menu__block-item__text hidden-text no-select">
-            {{list.name}}
-          </router-link>
-          <span class="left-menu__block-item__icons">
-            <i v-if="renamingId === -1"
-               class="fas fa-pencil-alt"
-               v-on:click="renameList(list.id)"></i>
-            <i v-if="renamingId === -1"
-               class="fas fa-trash"
-               v-on:click="removeList(list.id)"></i>
-            <i v-if="renamingId === list.id"
-               class="fas fa-check edit-icon"
-               v-on:click="doneEditList(list.id)"></i>
-          </span>
+            :class="{edit: renamingId !== -1, select:listId() === list.id}">
+          <div class="left-menu__block-item__content">
+            <input v-if="renamingId === list.id"
+                   v-model="renamingText"
+                   type="text"
+                   class="left-menu__block-item__input">
+            <router-link v-else
+                  :to="`/lists/${list.id}`"
+                  tag="div"
+                  class="left-menu__block-item__text hidden-text no-select">
+              {{list.name}}
+            </router-link>
+            <span class="left-menu__block-item__icons">
+              <i v-if="renamingId === -1"
+                 class="fas fa-pencil-alt"
+                 v-on:click="renameList(list.id)"></i>
+              <i v-if="renamingId === -1"
+                 class="fas fa-trash"
+                 v-on:click="removeList(list.id)"></i>
+              <i v-if="renamingId === list.id"
+                 class="fas fa-check edit-icon"
+                 v-on:click="doneEditList(list.id)"></i>
+            </span>
+          </div>
         </li>
       </ul>
     </div>
@@ -67,7 +69,7 @@ export default {
   },
   methods: {
     async removeList(id) {
-      const { positive, moveTo } = await this.$confirm(id, this.lists);
+      const { positive, moveTo } = await this.$confirm('delete-list', { id, lists: this.lists });
       if (positive) {
         await this.$store.dispatch('REMOVE_LIST', { id, moveTo });
         if (id === this.listId()) {

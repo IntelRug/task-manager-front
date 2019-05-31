@@ -23,7 +23,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'DeleteListDialog',
   data() {
@@ -34,10 +33,6 @@ export default {
   },
   created() {
     this.selected = this.lists[0].id;
-    console.log(this.lists);
-    console.log(this.removableListId);
-    console.log(this.removableList);
-    console.log(this.removableListInArrayId);
   },
   computed: {
     lists() {

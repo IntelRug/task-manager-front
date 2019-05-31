@@ -84,7 +84,7 @@ p {
 }
 
 .container {
-	min-width: 650px;
+	width: 1000px;
 }
 
 .main-page__header {
@@ -93,8 +93,9 @@ p {
     right: 0;
     top: 0;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    padding: 0 130px;
     background: #ffffff;
     border-top: 20px solid $e-color;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
@@ -104,7 +105,13 @@ p {
     display: flex;
     align-items: center;
 }
-
+.header-logo {
+	display: flex;
+	width: 190px;
+	height: 89px;
+	background: url('../../img/logo.png') no-repeat center / contain;
+	margin-right: auto;
+}
 .header-menu__item {
     margin: 0 16px;
     height: 70px;
@@ -203,7 +210,7 @@ section {
 
 .organization {
 	background: linear-gradient($o-color, $a-color);
-	padding: 100px 100px;
+	//padding: 100px 100px;
 }
 
 .share {
@@ -221,5 +228,115 @@ section {
 	background: linear-gradient($o-color, $a-color);
 }
 
+.features-list {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+.features-item {
+	width: 170px;
+	text-align: center;
+	margin: 0 10px 5px;
+}
+
+.features-item__title {
+	font-size: 15px;
+	font-weight: bold;
+}
+
+.features-item__text {
+	font-size: 12px;
+}
+
+.features-item__img {
+	background: no-repeat center / contain;
+	width: 60px;
+	height: 40px;
+	margin: auto;
+	margin-bottom: 10px;
+}
+
+.modal {
+	background: transparentize(#000210, 0.45);
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: fixed;
+	left: 0;
+	top: 0;
+	z-index: 1;
+}
+
+.modal-block {
+	background: #ffffff;
+	border-radius: 10px;
+	padding: 50px 88px;
+	flex: none;
+	position: relative;
+	&.login {
+		.modal-block__label {
+			align-items: flex-start;
+		}
+	}
+}
+
+.modal-block__close {
+	position: absolute;
+	right: 30px;
+	top: 30px;
+	cursor: pointer;
+	width: 20px;
+	height: 20px;
+	text-align: center;
+}
+
+.modal-block__content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.modal-block__title {
+	color: $e-color;
+	font-size: 25px;
+	font-weight: bold;
+	margin-bottom: 20px;
+}
+
+.modal-block__label {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+	margin-bottom: 10px;
+}
+
+.modal-block__input {
+	margin-top: 10px;
+	height: 50px;
+	border: 1px solid transparentize($t-color, 0.52);
+	width: 300px;
+	color: transparentize($y-color, 0.5);
+	text-align: center;
+	padding: 0 20px;
+	&::placeholder {
+		color: transparentize($y-color, 0.5);
+	}
+}
+
+.modal-block__btn {
+	background: $e-color;
+	color: #ffffff;
+	height: 50px;
+	width: 100%;
+	text-align: center;
+	line-height: 50px;
+	cursor: pointer;
+	margin-top: 15px;
+	font-size: 16px;
+}
 
 @import 'media'; 
