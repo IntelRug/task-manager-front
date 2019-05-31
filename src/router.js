@@ -9,10 +9,21 @@ Vue.use(Router);
 export default new Router({
   mode: 'history',
   linkActiveClass: 'select',
-  base: process.env.BASE_URL,
   routes: [
     {
       path: '/lists/:listId/tasks/:taskId',
+      components: {
+        left: List,
+        default: Main,
+        right: Task,
+      },
+      props: {
+        default: true,
+        right: true,
+      },
+    },
+    {
+      path: '/lists/:listId/tasks/create',
       components: {
         left: List,
         default: Main,

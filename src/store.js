@@ -20,7 +20,16 @@ export default new Vuex.Store({
           return {};
         }
         const task = state.tasks.find(t => t.id === id);
-        if (!task) return {};
+        if (!task) {
+          return {
+            id: -1,
+            name: 'Новая задача',
+            description: 'Описание задачи',
+            status: 0,
+            list_id: state.tasks[0] ? state.tasks[0].list_id : 0,
+            executors: [],
+          };
+        }
         return task;
       };
     },
@@ -69,6 +78,13 @@ export default new Vuex.Store({
           state.tasks.push(task);
         }
       });
+    },
+    REMOVE_TASK(state, id) {
+      Vue.set(state, 'tasks', state.tasks || []);
+      const index = state.tasks.findIndex(l => l.id === id);
+      if (index !== -1) {
+        state.tasks.splice(index, 1);
+      }
     },
     SET_LISTS(state, lists = []) {
       Vue.set(state, 'lists', lists);
@@ -123,6 +139,42 @@ export default new Vuex.Store({
       try {
         const { data } = await Vue.API.get(`tasks/${id}`);
         commit('ADD_TASKS', [data.task]);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async CREATE_TASK({ commit }, options = {}) {
+      try {
+        const { data } = await Vue.API.post('tasks', options);
+        commit('ADD_TASKS', [data.task]);
+        return data.task;
+      } catch (e) {
+        console.log(e);
+        return {};
+      }
+    },
+    async REMOVE_TASK({ commit }, id) {
+      try {
+        await Vue.API.delete(`tasks/${id}`);
+        commit('REMOVE_TASK', id);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async EDIT_TASK({ commit }, { id, options = {} }) {
+      try {
+        const { data } = await Vue.API.put(`tasks/${id}`, options);
+        commit('ADD_TASKS', [data.task]);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async SET_TASK_EXECUTORS({ dispatch }, { id, ids = '' }) {
+      try {
+        await Vue.API.post(`tasks/${id}/executors`, {
+          user_ids: ids,
+        });
+        dispatch('GET_TASK', id);
       } catch (e) {
         console.log(e);
       }
