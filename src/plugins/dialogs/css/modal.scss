@@ -1,0 +1,133 @@
+@import '../../../css/variables';
+.alert-modal {
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	width: 100vw;
+	height: 100vh;
+	background: #0000008f;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	.alert-block {
+		width: 400px;
+	}
+	.alert-block__header {
+		height: 50px;
+		background: $e-color;
+		border-radius: 4px 4px 0 0;
+		display: flex;
+		align-items: center;
+		color: $o-color;
+		padding: 0 20px;
+		font-size: 14px;
+	}
+	.alert-block__content {
+		background: $o-color;
+		padding: 20px;
+		overflow: hidden;
+		font-size: 14px;
+	}
+	.alert-block__footer {
+		height: 50px;
+		background: #f1f1f1;
+		border-radius: 0 0 4px 4px;
+		border-top: 1px solid #d4d4d4;
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+	}
+	.alert-block__footer-btn {
+	    border-radius: 4px;
+	    padding: 7px 16px 8px;
+	    margin-right: 10px;
+	    color: #ffffff;
+	    cursor: pointer;
+	    transition: all .3s ease;
+	    &.primary {
+	    	background: #4a76a8;
+	    	&:hover {
+	    		background: #416792;
+	    	}
+	    }
+	    &.secondary {
+	    	color: #636363;
+	    	background: #dadada;
+	    	&:hover {
+	    		background: #bdbdbd;
+	    		color: #ffffff;
+	    	}
+	    }
+	}
+	.alert-block__footer-label {
+		margin-right: auto;
+		//margin-left: 5px;
+		height: 20px;
+		position: relative;
+		padding-left: 18px;
+		margin-top: 10px;
+		display: block;
+	}
+	.alert-block__footer-input {
+		position: absolute;
+		left: 0;
+		top: 2px;
+		margin-left: 0;
+	}
+	.alert-block_user {
+		display: flex;
+		align-items: center;
+	}
+	.alert-block_user-img {
+		width: 130px;
+		height: 130px;
+		border-radius: 50%;
+		background: no-repeat center / cover;
+		position: relative;
+		overflow: hidden;
+		cursor: pointer;
+		flex: none;
+		margin-right: 30px;
+		.alert-block_user-img__upload {
+			transition: all .3s ease;
+			background: #00000078;
+			position: absolute;
+			left: 0;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			opacity: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 35px;
+			color: #ffffff;
+		}
+		&:hover {
+			.alert-block_user-img__upload {
+				opacity: 1;
+			}
+		}
+	}
+	.alert-block_user-label {
+		margin-bottom: 10px;
+		display: block;
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+	.alert-block_user-label__text {
+		margin-bottom: 2px;
+		display: block;
+		color: #737373;
+	}
+	.alert-block_user-input {
+		height: 26px;
+		padding: 0 10px;
+		border: 1px solid #eeeeee;
+	}
+}
