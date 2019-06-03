@@ -109,7 +109,7 @@ p {
 	display: flex;
 	width: 190px;
 	height: 89px;
-	background: url('../../img/logo.png') no-repeat center / contain;
+	background: url('/img/logo.png') no-repeat center / contain;
 	margin-right: auto;
 }
 .header-menu__item {
@@ -148,7 +148,7 @@ p {
 header {
 	height: 100vh;
 	min-height: 600px;
-	background: url('/../img/office-3.png');
+	background: url('/img/office-3.png');
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size: cover;
@@ -272,8 +272,8 @@ section {
 
 .modal-block {
 	background: #ffffff;
-	border-radius: 10px;
-	padding: 50px 88px;
+	border-radius: 3px;
+	padding: 35px 45px;
 	flex: none;
 	position: relative;
 	&.login {
@@ -316,11 +316,11 @@ section {
 
 .modal-block__input {
 	margin-top: 10px;
-	height: 50px;
+	height: 40px;
 	border: 1px solid transparentize($t-color, 0.52);
-	width: 300px;
-	color: transparentize($y-color, 0.5);
-	text-align: center;
+	width: 250px;
+	color: #505050;
+	text-align: left;
 	padding: 0 20px;
 	&::placeholder {
 		color: transparentize($y-color, 0.5);

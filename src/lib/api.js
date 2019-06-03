@@ -8,9 +8,10 @@ Vue.use(VueCookies);
 export default class Api {
   static defaultOptions = {
     baseURL: process.env.VUE_APP_API,
+    loginURL: '/login',
+    mainURL: '/',
     headers: {
-      // Authorization: `Bearer ${Vue.cookies.get('access_token')}`,
-      Authorization: 'Bearer db2171b5e95d456fb8d5a619402a9dfb70b37ec6698ac729ff97349c2a49fddfb6f2dfbb3ce539e82c3b200a3e98825f',
+      Authorization: `Bearer ${Vue.cookies.get('access_token')}`,
       'Content-Type': 'application/json;charset=utf-8',
     },
   };
@@ -19,7 +20,10 @@ export default class Api {
 
   constructor(options = {}) {
     this.baseURL = Object.prototype.hasOwnProperty.call(options, 'baseURL') ? options.baseURL : Api.defaultOptions.baseURL;
+    this.mainURL = Object.prototype.hasOwnProperty.call(options, 'mainURL') ? options.mainURL : Api.defaultOptions.mainURL;
+    this.loginURL = Object.prototype.hasOwnProperty.call(options, 'loginURL') ? options.loginURL : Api.defaultOptions.loginURL;
     this.headers = Object.prototype.hasOwnProperty.call(options, 'headers') ? options.headers : Api.defaultOptions.headers;
+    this.onUnauthorized();
   }
 
   static createCancelToken() {
@@ -33,7 +37,7 @@ export default class Api {
     this.createCancelToken();
   }
 
-  static onUnauthorized(callback) {
+  onUnauthorized(callback = () => {}) {
     axios.interceptors.response.use(
       (response) => {
         if (!response || !response.data) {
@@ -45,6 +49,8 @@ export default class Api {
         const status = error.response ? error.response.status : null;
 
         if (status === 401) {
+          Vue.cookies.remove('access_token');
+          this.goToLoginURL();
           callback();
         }
         return Promise.reject(error);
@@ -52,9 +58,23 @@ export default class Api {
     );
   }
 
+  isLoggedIn() {
+    return Vue.cookies.isKey('access_token');
+  }
+
+  goToMainURL() {
+    window.location.pathname = this.mainURL;
+  }
+
+  goToLoginURL() {
+    window.location.pathname = this.loginURL;
+  }
+
   async login(data = {}) {
     try {
-      const localData = { ...data, grant_type: 'password' };
+      const localData = {
+        ...data, grant_type: 'password', client_id: '1', client_secret: '1',
+      };
       const response = await axios({
         url: `${this.baseURL}/oauth/token`,
         method: 'POST',
@@ -62,13 +82,15 @@ export default class Api {
         cancelToken: Api.cancelToken.token,
       });
       Vue.cookies.set('access_token', response.data.access_token, 60 * 60 * 24 * 365);
+      this.goToMainURL();
     } catch (e) {
       if (!axios.isCancel(e)) throw e;
     }
   }
 
-  static logout() {
+  logout() {
     Vue.cookies.remove('access_token');
+    this.goToLoginURL();
   }
 
   async register(data = {}) {

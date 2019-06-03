@@ -137,6 +137,9 @@ export default {
     },
   },
   async created() {
+    if (this.listId() === -1) {
+      this.$router.replace('');
+    }
     await this.$store.dispatch('GET_TASKS', {
       list_id: this.listId(),
     });
