@@ -24,7 +24,7 @@
                   class="left-menu__block-item__text hidden-text no-select">
               {{list.name}}
             </router-link>
-            <span class="left-menu__block-item__icons">
+            <span v-if="!list.settings.default" class="left-menu__block-item__icons">
               <i v-if="renamingId === -1"
                  class="fas fa-pencil-alt"
                  v-on:click="renameList(list.id)"></i>
@@ -40,8 +40,16 @@
       </ul>
     </div>
     <div class="left-menu__btn">
-      <div class="left-menu__btn-column active"><i class="fas fa-user-tie"></i></div>
-      <div class="left-menu__btn-column"><i class="fas fa-users"></i></div>
+      <router-link to="/"
+                   tag="div"
+                   class="left-menu__btn-column active">
+        <i class="fas fa-user-tie"></i>
+      </router-link>
+      <router-link to="/organizations"
+           tag="div"
+           class="left-menu__btn-column">
+        <i class="fas fa-users"></i>
+      </router-link>
     </div>
   </div>
 </template>
@@ -58,8 +66,11 @@ export default {
       renamingText: '',
     };
   },
-  created() {
-    this.$store.dispatch('GET_LISTS');
+  async created() {
+    await this.$store.dispatch('GET_LISTS');
+    if (this.listId() === -1) {
+      this.$router.replace(`/lists/${this.lists[0].id}`);
+    }
   },
   computed: {
     ...mapGetters(['lists', 'list']),

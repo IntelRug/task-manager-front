@@ -204,7 +204,7 @@ p {
 				&:last-child {
 					border-bottom: none;
 				}
-				&:not(.select-org):hover {
+				:hover {
 					background: $a-color;
 					.left-menu__block-item__icons {
 						opacity: 1;
@@ -265,6 +265,28 @@ p {
 			}
 			.left-menu__block-item__lists {
 				border-top: 1px solid #eee;
+			}
+			.left-menu__block-item__list-create {
+				//padding: 8px 15px 8px 30px;
+				padding-right: 15px;
+				transition: all .3s ease;
+				display: flex;
+				align-items: center;
+				border-bottom: 1px solid $q-color;
+				.left-menu__block-item__list-text {
+					color: $e-color;
+				}
+				&:hover {
+					.left-menu__block-item__list-text {
+						padding-left: 35px;
+					}
+				}
+				.left-menu__block-item__list-icons {
+					opacity: 1;
+				}
+				.left-menu__block-item__input {
+					margin: 8px 10px 8px 30px;
+				}
 			}
 			.left-menu__block-item__list {
 				//padding: 8px 15px 8px 30px;

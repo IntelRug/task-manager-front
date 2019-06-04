@@ -1,10 +1,14 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Task from './components/Task.vue';
-import List from './components/List.vue';
+import OTask from './components/OTask.vue';
+import UTask from './components/UTask.vue';
+import UList from './components/UList.vue';
 import Main from './components/Main.vue';
+import OMain from './components/OMain.vue';
 import Login from './components/Login.vue';
 import Register from './components/Register.vue';
+import OrganizationsList from './components/OList.vue';
+import Organization from './components/Organization.vue';
 
 Vue.use(Router);
 
@@ -33,9 +37,9 @@ export default new Router({
     {
       path: '/lists/:listId/tasks/:taskId',
       components: {
-        left: List,
+        left: UList,
         default: Main,
-        right: Task,
+        right: UTask,
       },
       props: {
         default: true,
@@ -45,9 +49,9 @@ export default new Router({
     {
       path: '/lists/:listId/tasks/create',
       components: {
-        left: List,
+        left: UList,
         default: Main,
-        right: Task,
+        right: UTask,
       },
       props: {
         default: true,
@@ -57,7 +61,7 @@ export default new Router({
     {
       path: '/lists/:listId',
       components: {
-        left: List,
+        left: UList,
         default: Main,
       },
       props: {
@@ -67,11 +71,55 @@ export default new Router({
     {
       path: '/',
       components: {
-        left: List,
+        left: UList,
         default: Main,
       },
       props: {
         default: true,
+      },
+    },
+    {
+      path: '/organizations',
+      components: {
+        left: OrganizationsList,
+      },
+      props: {
+        left: true,
+      },
+    },
+    {
+      path: '/organizations/:organizationId',
+      components: {
+        left: OrganizationsList,
+        default: Organization,
+      },
+      props: {
+        left: true,
+        default: true,
+      },
+    },
+    {
+      path: '/organizations/:organizationId/lists/:listId',
+      components: {
+        left: OrganizationsList,
+        default: OMain,
+      },
+      props: {
+        left: true,
+        default: true,
+      },
+    },
+    {
+      path: '/organizations/:organizationId/lists/:listId/tasks/:taskId',
+      components: {
+        left: OrganizationsList,
+        default: OMain,
+        right: OTask,
+      },
+      props: {
+        left: true,
+        default: true,
+        right: true,
       },
     },
   ],

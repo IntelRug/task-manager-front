@@ -22,7 +22,7 @@
           <div class="control-tasks__button-content">
             <select v-model="listIndex" class="control-tasks__button-input">
               <option
-                v-for="list in lists"
+                v-for="list in organizationLists"
                 :key="list.id"
                 :value="list.id"
                 :selected="list.id === (task.list_id ? task.list_id : listId())">
@@ -57,7 +57,7 @@
             <div v-for="id in executorsIds"
                  :key="id"
                  class="control-tasks__user">
-              {{user(id).first_name}} {{user(id).last_name}}
+              {{organizationMember(id).first_name}} {{organizationMember(id).last_name}}
               <span class="control-tasks__user-del" title="Убрать" v-on:click="removeExecutor(id)">
                 <i class="fas fa-times"></i>
               </span>
@@ -142,18 +142,31 @@ export default {
     this.init();
   },
   computed: {
-    ...mapGetters(['users', 'user', 'lists', 'list', 'tasks']),
+    ...mapGetters([
+      'organizationMembers',
+      'organizationMember',
+      'organizationLists',
+      'organizationList',
+      'organizationTask',
+      'organizationTasks',
+    ]),
     taskId() {
       return paramInt('taskId', this.$route.params);
     },
     listId() {
       return paramInt('listId', this.$route.params);
     },
+    organizationId() {
+      return paramInt('organizationId', this.$route.params);
+    },
     task() {
-      return this.$store.getters.task(this.taskId());
+      return this.organizationTask(this.taskId());
+    },
+    tasks() {
+      return this.organizationTasks;
     },
     potentialExecutors() {
-      return this.users.filter((user) => {
+      return this.organizationMembers.filter((user) => {
         const userExist = this.executorsIds.indexOf(user.id) !== -1;
         const searchText = this.searchExecutorsText.toLowerCase();
         const username = user.username.toLowerCase();
@@ -203,9 +216,12 @@ export default {
       this.deadlineTime = this.currentTime();
       if (this.taskId(params) === -1) return;
       const load = [
-        this.$store.dispatch('GET_TASK', this.taskId(params)),
-        this.$store.dispatch('GET_LISTS'),
-        this.$store.dispatch('GET_USERS'),
+        this.$store.dispatch('GET_ORGANIZATION_TASK', {
+          organizationId: this.organizationId(params),
+          taskId: this.taskId(params),
+        }),
+        this.$store.dispatch('GET_ORGANIZATION_LISTS', this.organizationId(params)),
+        this.$store.dispatch('GET_ORGANIZATION_MEMBERS', this.organizationId(params)),
       ];
       if (!this.tasks.find(({ id }) => id == this.taskId(params))) {
         await Promise.all(load);
@@ -226,13 +242,14 @@ export default {
     toggleAddExecutors() {
       this.addExecutorsOpened = !this.addExecutorsOpened;
       if (this.addExecutorsOpened) {
-        this.$store.dispatch('GET_USERS');
+        this.$store.dispatch('GET_ORGANIZATION_MEMBERS', this.organizationId());
       }
     },
     toggleNameEdit() {
       this.nameEdit = !this.nameEdit;
     },
     addExecutor(id) {
+      this.toggleAddExecutors();
       const index = this.executorsIds.indexOf(id);
       if (index === -1) {
         this.executorsIds.push(id);
@@ -248,7 +265,7 @@ export default {
       if (this.task.id !== -1) {
         let lastIdDiffers = false;
         const options = {};
-        if (this.name !== this.task.name)options.name = this.name;
+        if (this.name !== this.task.name) options.name = this.name;
         if (this.description !== this.task.description) options.description = this.description;
         if (this.status !== this.task.status) options.status = this.status;
         if (this.listIndex !== this.task.list_id) {
@@ -258,13 +275,19 @@ export default {
         if (this.deadlineAt !== this.task.deadline_at) options.deadline_at = this.deadlineAt;
         if (this.important !== this.task.important) options.important = this.important ? 1 : 0;
         await Promise.all([
-          this.$store.dispatch('SET_TASK_EXECUTORS', { id: this.task.id, ids: this.executorsIdsString }),
-          this.$store.dispatch('EDIT_TASK', { id: this.task.id, options }),
+          this.$store.dispatch('SET_ORGANIZATION_TASK_EXECUTORS', {
+            organizationId: this.organizationId(),
+            taskId: this.task.id,
+            ids: this.executorsIdsString,
+          }),
+          this.$store.dispatch('EDIT_ORGANIZATION_TASK', {
+            organizationId: this.organizationId(),
+            taskId: this.task.id,
+            options,
+          }),
         ]);
         if (lastIdDiffers) {
-          await this.$store.dispatch('GET_TASKS', {
-            list_id: this.listId(),
-          });
+          this.$router.replace(`/organizations/${this.organizationId()}/lists/${options.list_id}/tasks/${this.task.id}`);
         }
       } else {
         const options = {
@@ -275,15 +298,39 @@ export default {
           deadline_at: this.deadlineAt,
           important: this.important ? 1 : 0,
         };
-        const task = await this.$store.dispatch('CREATE_TASK', options);
-        await this.$store.dispatch('SET_TASK_EXECUTORS', { id: task.id, ids: this.executorsIds });
-        this.$router.replace(`/lists/${task.list_id}/tasks/${task.id}`);
+        const task = await this.$store.dispatch('CREATE_ORGANIZATION_TASK', {
+          organizationId: this.organizationId(),
+          options,
+        });
+        await this.$store.dispatch('SET_ORGANIZATION_TASK_EXECUTORS', {
+          organizationId: this.organizationId(),
+          taskId: task.id,
+          ids: this.executorsIdsString,
+        });
+        this.$router.replace(`/organizations/${this.organizationId()}/lists/${task.list_id}/tasks/${task.id}`);
       }
     },
     async remove() {
       const { positive } = await this.$confirm('delete-task', { task: this.task });
+
       if (positive) {
-        this.$store.dispatch('REMOVE_TASK', this.task.id);
+        let redirectUrl = `/organizations/${this.organizationId()}/lists/${this.listId()}`;
+        if (this.tasks.length > 0) {
+          const id = this.tasks.findIndex(t => t.id === this.task.id);
+          if (id !== -1) {
+            if (this.tasks[id + 1]) {
+              redirectUrl = `/organizations/${this.organizationId()}/lists/${this.listId()}/tasks/${this.tasks[id + 1].id}`;
+            } else {
+              redirectUrl = `/organizations/${this.organizationId()}/lists/${this.listId()}/tasks/${this.tasks[id - 1].id}`;
+            }
+          }
+        }
+        this.$router.replace(redirectUrl);
+
+        this.$store.dispatch('REMOVE_ORGANIZATION_TASK', {
+          organizationId: this.organizationId(),
+          taskId: this.task.id,
+        });
       }
     },
   },

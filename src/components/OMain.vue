@@ -2,10 +2,9 @@
   <div class="main-page__container">
     <div class="main-page__task-list">
       <div class="task-list__header material-block">
-        <router-link :to="`/lists/${listId()}/tasks/create`"
+        <router-link :to="`/organizations/${organizationId()}/lists/${listId()}/tasks/create`"
                      tag="div"
-                     class="task-list__header-create no-select">Создать задачу
-        </router-link>
+                     class="task-list__header-create no-select">Создать задачу</router-link>
         <div class="task-list__header-sort no-select"
              v-on:click="toggleSort">
           <span v-html="sortHtmlCurrent"></span>
@@ -31,7 +30,7 @@
                  class="task-item__status">
               {{taskStatus(task).text}}
             </div>
-            <div class="task-item__author hidden-text">{{taskDeadline(task)}}</div>
+            <div class="task-item__author hidden-text">{{taskExecutorsString(task)}}</div>
           </router-link>
         </ul>
       </div>
@@ -57,25 +56,34 @@ export default {
       ],
     };
   },
-  beforeRouteUpdate(to, from, next) {
-    this.$store.dispatch('GET_TASKS', {
-      list_id: this.listId(to.params),
+  async beforeRouteUpdate(to, from, next) {
+    await this.$store.dispatch('GET_ORGANIZATION_TASKS', {
+      organizationId: this.organizationId(to.params),
+      options: {
+        list_id: this.listId(to.params),
+      },
     });
     next();
   },
-  beforeRouteLeave(to, from, next) {
-    this.$store.dispatch('GET_TASKS', {
-      list_id: this.listId(to.params),
+  async beforeRouteLeave(to, from, next) {
+    await this.$store.dispatch('GET_ORGANIZATION_TASKS', {
+      organizationId: this.organizationId(to.params),
+      options: {
+        list_id: this.listId(to.params),
+      },
     });
     next();
   },
   computed: {
-    ...mapGetters(['tasks']),
+    ...mapGetters(['organizationTasks']),
     listId() {
       return paramInt('listId', this.$route.params);
     },
+    organizationId() {
+      return paramInt('organizationId', this.$route.params);
+    },
     sortedTasks() {
-      return this.sort(this.tasks);
+      return this.sort(this.organizationTasks);
     },
     taskStatus() {
       return ({ status }) => {
@@ -101,30 +109,18 @@ export default {
       return this.sortHtmlAll[this.sortType];
     },
     taskLink() {
-      return ({ id }) => (this.$route.fullPath === `/lists/${this.listId()}/tasks/${id}`
-        ? `/lists/${this.listId()}` : `/lists/${this.listId()}/tasks/${id}`);
+      return ({ id }) => (this.$route.fullPath
+      === `/organizations/${this.organizationId()}/lists/${this.listId()}/tasks/${id}`
+        ? `/organizations/${this.organizationId()}/lists/${this.listId()}`
+        : `/organizations/${this.organizationId()}/lists/${this.listId()}/tasks/${id}`);
     },
-    currentDate() {
-      return (time) => {
-        const match = this.localISOTime(time).match(/(.*)T(.*):/);
-        return match[1];
+    taskExecutorsString() {
+      return ({ executors }) => {
+        if (Array.isArray(executors) && executors.length > 0) {
+          return executors.map(e => `${e.first_name} ${e.last_name}`).join(', ');
+        }
+        return 'Нет исполнителей';
       };
-    },
-    currentTime() {
-      return (time) => {
-        const match = this.localISOTime(time).match(/(.*)T(.*):/);
-        return match[2];
-      };
-    },
-    localISOTime() {
-      return (time) => {
-        const timeZoneOffset = (new Date()).getTimezoneOffset() * 60000;
-        const date = new Date((time || Date.now()) - timeZoneOffset);
-        return date.toISOString();
-      };
-    },
-    taskDeadline() {
-      return ({ deadline_at: deadlineAt }) => (`${this.currentDate(deadlineAt)} ${this.currentTime(deadlineAt)}`);
     },
   },
   methods: {
@@ -155,11 +151,14 @@ export default {
     if (this.listId() === -1) {
       this.$router.replace('');
     }
-    await this.$store.dispatch('GET_TASKS', {
-      list_id: this.listId(),
+    await this.$store.dispatch('GET_ORGANIZATION_TASKS', {
+      organizationId: this.organizationId(),
+      options: {
+        list_id: this.listId(),
+      },
     });
     await this.$nextTick();
-    this.sort(this.tasks);
+    this.sort(this.organizationTasks);
   },
 };
 </script>
