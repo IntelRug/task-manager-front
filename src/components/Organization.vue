@@ -228,7 +228,7 @@ export default {
       });
     },
     openRolesOnUser(userId) {
-      if (this.currentUserRole <= 1 && this.currentUser.id !== userId) {
+      if (this.canAccessUser) {
         this.openedRolesId = this.openedRolesId === userId ? -1 : userId;
       }
     },
