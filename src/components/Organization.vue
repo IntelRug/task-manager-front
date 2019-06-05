@@ -36,87 +36,97 @@
           <div class="new-members__group">
             <div class="new-members__group-title">Выберите участников для приглашения</div>
             <div class="new-members__list-members new-members__form">
-              <div class="new-members__form-dropdown no-select hidden-block">
-                <div class="new-members__form-dropdown__item-text">Нет результатов</div>
-                <div class="new-members__form-dropdown__item">
+              <div v-if="newMembersOpened" class="new-members__form-dropdown no-select">
+                <div v-if="potentialMembers.length === 0"
+                     class="new-members__form-dropdown__item-text">
+                  Нет результатов
+                </div>
+                <div v-for="u in potentialMembers"
+                     :key="u.id"
+                     v-on:click="addSelectedUser(u.id)"
+                     class="new-members__form-dropdown__item">
                   <div class="new-members__form-dropdown__item-img"
                        style="background-image: url(/img/avatar.png);"></div>
                   <div class="new-members__form-dropdown__item-info">
-                    <div class="new-members__form-dropdown__item-name">Святослав Федоров</div>
-                    <div class="new-members__form-dropdown__item-nick">@IntelRug</div>
-                  </div>
-                </div>
-                <div class="new-members__form-dropdown__item">
-                  <div class="new-members__form-dropdown__item-img"
-                       style="background-image: url(/img/avatar.png);"></div>
-                  <div class="new-members__form-dropdown__item-info">
-                    <div class="new-members__form-dropdown__item-name">Артём Дивеев</div>
-                    <div class="new-members__form-dropdown__item-nick">@TrenLok</div>
+                    <div class="new-members__form-dropdown__item-name">
+                      {{u.first_name}} {{u.last_name}}
+                    </div>
+                    <div class="new-members__form-dropdown__item-nick">@{{u.username}}</div>
                   </div>
                 </div>
               </div>
-              <div class="new-members__form-placeholer">Найдите и выберите участников</div>
-              <div class="new-members__list-members__item">Святослав Федоров <span
-                class="new-members__list-members__item-del"><i class="fas fa-times"></i></span>
-              </div>
-              <div class="new-members__list-members__item">TrenLok <span
-                class="new-members__list-members__item-del"><i class="fas fa-times"></i></span>
+              <input type="text"
+                     class="new-members__form-placeholer"
+                     placeholder="Найдите и выберите участников"
+                     v-model="searchUsersText"
+                     @focus="openNewMembers"
+                     @blur="closeNewMembers">
+              <div v-for="id in selectedUsersIds"
+                   :key="id"
+                   class="new-members__list-members__item">
+                <span class="new-members__list-members__item-del">
+                  {{user(id).first_name}} {{user(id).last_name}}
+                  <i class="fas fa-times" v-on:click="removeSelectedUser(id)"></i>
+                </span>
               </div>
             </div>
           </div>
           <div class="new-members__group">
             <div class="new-members__group-title">Выберите роль</div>
             <div class="new-members__select-role new-members__form">
-              <div class="new-members__form-dropdown no-select hidden-block">
-                <div class="new-members__form-dropdown__item">
-                  Роль 1
-                </div>
-                <div class="new-members__form-dropdown__item">
-                  Роль 2
+              <div v-if="openedRoles" class="new-members__form-dropdown no-select">
+                <div v-for="(role, index) in selectRoles"
+                     :key="index"
+                     v-on:click="selectRole(index + 1)"
+                     class="new-members__form-dropdown__item">
+                  {{role}}
                 </div>
               </div>
-              <div class="new-members__form-placeholer">Guests</div>
+              <div v-on:click="toggleRoles" class="new-members__form-placeholer">
+                {{roles[selectedRoleId]}}
+              </div>
             </div>
           </div>
           <div class="new-members__group">
             <div class="new-members__footer-buttons">
-              <div class="new-members__footer-button primary">Добавить в проект</div>
+              <div class="new-members__footer-button primary"
+                   v-on:click="addSelectedUsersToOrganization">
+                Добавить в проект
+              </div>
             </div>
           </div>
         </div>
         <div class="organization-page__body-title__small">Существующие участники</div>
         <div class="organization-page__existing-members">
-          <div class="organization-page__existing-member">
+          <div v-for="u in organizationMembers"
+               :key="u.id"
+               class="organization-page__existing-member">
             <div class="organization-page__existing-img"
                  style="background-image: url(/img/avatar.png);"></div>
             <div class="organization-page__existing-info">
-              <div class="organization-page__existing-name">Артём Дивеев</div>
-              <div class="organization-page__existing-nick">@TrenLok</div>
+              <div class="organization-page__existing-name">{{u.first_name}} {{u.last_name}}</div>
+              <div class="organization-page__existing-nick">@{{u.username}}</div>
             </div>
-          </div>
-          <div class="organization-page__existing-member">
-            <div class="organization-page__existing-img"
-                 style="background-image: url(img/avatar.png);"></div>
-            <div class="organization-page__existing-left">
-              <div class="organization-page__existing-info">
-                <div class="organization-page__existing-name">Святослав Федоров</div>
-                <div class="organization-page__existing-nick">@IntelRug</div>
-              </div>
-              <div class="organization-page__existing-control no-select">
-                <div class="new-members__group">
-                  <div class="new-members__list-members new-members__form">
-                    <div class="new-members__form-dropdown no-select hidden-block">
-                      <div class="new-members__form-dropdown__item">
-                        Роль 1
-                      </div>
-                      <div class="new-members__form-dropdown__item">
-                        Роль 2
-                      </div>
+            <div class="organization-page__existing-control no-select">
+              <div class="new-members__group" v-on:click="openRolesOnUser(u.id)">
+                <div class="new-members__list-members new-members__form">
+                  <div v-if="openedRolesId === u.id"
+                       class="new-members__form-dropdown no-select">
+                    <div v-for="(role, index) in roles"
+                         :key="index"
+                         class="new-members__form-dropdown__item"
+                         v-on:click="setRole(u.id, index)">
+                      {{role}}
                     </div>
-                    <div class="new-members__form-placeholer">Guests</div>
                   </div>
+                  <div class="new-members__form-placeholer">{{roles[u.settings.role_id]}}</div>
                 </div>
-                <div class="organization-page__existing-del"><i class="fas fa-trash-alt"></i></div>
+              </div>
+              <div
+                v-if="canAccessUser(u)"
+                class="organization-page__existing-del"
+                v-on:click="removeUserFromOrganization(u.id)">
+                <i class="fas fa-trash-alt"></i>
               </div>
             </div>
           </div>
@@ -127,24 +137,127 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import { paramInt } from '../lib/RouterHelper';
 
 export default {
   name: 'Organization',
   data() {
     return {
-
+      chooseNewMembersFocused: false,
+      openedRoles: false,
+      selectedRoleId: 2,
+      openedRolesId: -1,
+      roles: [
+        'Creator',
+        'Moderator',
+        'User',
+      ],
+      selectRoles: [
+        'Moderator',
+        'User',
+      ],
+      selectedUsersIds: [],
+      searchUsersText: '',
     };
   },
   created() {
-
+    this.$store.dispatch('GET_ORGANIZATION_MEMBERS', this.organizationId());
   },
   computed: {
+    ...mapGetters(['users', 'user', 'organizationMembers', 'currentUser']),
     organizationId() {
       return paramInt('organizationId', this.$route.params);
     },
     organization() {
       return this.$store.getters.organization(this.organizationId());
+    },
+    newMembersOpened() {
+      return this.chooseNewMembersFocused;
+    },
+    currentUserRole() {
+      return this.currentUser.settings ? this.currentUser.settings.role_id : 2;
+    },
+    selectedUsersIdsString() {
+      return Array.isArray(this.selectedUsersIds) && this.selectedUsersIds.length ? this.selectedUsersIds.join(',') : '';
+    },
+    potentialMembers() {
+      return this.users.filter((user) => {
+        const userSelected = this.selectedUsersIds.indexOf(user.id) !== -1;
+        const userExist = this.organizationMembers.findIndex(u => u.id === user.id) !== -1;
+        const searchText = this.searchUsersText.toLowerCase();
+        const username = user.username.toLowerCase();
+        const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
+        const searchContainsUsername = username.search(searchText) !== -1;
+        const searchContainsName = fullName.search(searchText) !== -1;
+        return !userSelected && !userExist && (
+          searchContainsName
+          || searchContainsUsername
+          || searchText === ''
+        );
+      });
+    },
+    canAccessUser() {
+      return u => (this.currentUserRole <= 1 && this.currentUser.id)
+        && !(this.currentUserRole === 1 && u.settings.role_id === 0)
+      && !(this.currentUser.id === u.id);
+    },
+  },
+  methods: {
+    openNewMembers() {
+      this.$store.dispatch('GET_USERS');
+      this.chooseNewMembersFocused = true;
+    },
+    closeNewMembers() {
+      setTimeout(() => {
+        this.chooseNewMembersFocused = false;
+      }, 100);
+    },
+    toggleRoles() {
+      this.openedRoles = !this.openedRoles;
+    },
+    selectRole(id) {
+      this.selectedRoleId = id;
+      this.toggleRoles();
+    },
+    setRole(userId, roleId) {
+      this.$store.dispatch('SET_ORGANIZATION_MEMBERS_ROLE', {
+        organizationId: this.organizationId(),
+        userIds: userId,
+        roleId,
+      });
+    },
+    openRolesOnUser(userId) {
+      if (this.currentUserRole <= 1 && this.currentUser.id !== userId) {
+        this.openedRolesId = this.openedRolesId === userId ? -1 : userId;
+      }
+    },
+    addSelectedUser(id) {
+      this.searchUsersText = '';
+      const index = this.selectedUsersIds.indexOf(id);
+      if (index === -1) {
+        this.selectedUsersIds.push(id);
+      }
+    },
+    removeSelectedUser(id) {
+      const index = this.selectedUsersIds.indexOf(id);
+      if (index !== -1) {
+        this.selectedUsersIds.splice(index, 1);
+      }
+    },
+    async addSelectedUsersToOrganization() {
+      await this.$store.dispatch('ADD_ORGANIZATION_MEMBERS', {
+        organizationId: this.organizationId(),
+        userIds: this.selectedUsersIds.join(','),
+        roleId: this.selectedRoleId,
+      });
+      this.selectedUsersIds = [];
+    },
+    removeUserFromOrganization(userId) {
+      this.$store.dispatch('REMOVE_ORGANIZATION_MEMBERS', {
+        organizationId: this.organizationId(),
+        userIds: userId,
+      });
     },
   },
 };

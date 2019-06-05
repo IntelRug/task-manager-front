@@ -21,5 +21,6 @@ new Vue({
       loginURL: '/about',
       mainURL: '/',
     });
+    this.$store.commit('SET_CURRENT_USER_ID', Vue.API.getUserId());
   },
 }).$mount('#app');

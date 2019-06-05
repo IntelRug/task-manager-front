@@ -556,6 +556,11 @@ p {
 			}
 			.new-members__form-placeholer {
 				color: #848484;
+				background: #fff;
+				border: 0;
+				font-size: 13px;
+				height: 23px;
+				width: 200px;
 			}
 			.new-members__list-members {
 				display: flex;
@@ -616,7 +621,7 @@ p {
 				margin-bottom: 6px;
 				.new-members__list-members__item-del {
 					margin-left: 5px;
-					font-size: 10px;
+					font-size: 13px;
 					color: #a9a9a9;
 					line-height: 10px;
 				}

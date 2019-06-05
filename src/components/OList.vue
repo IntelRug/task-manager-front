@@ -108,9 +108,6 @@ export default {
     await this.$store.dispatch('GET_ORGANIZATIONS');
     if (this.organizationId() !== -1) {
       await this.$store.dispatch('GET_ORGANIZATION_LISTS', this.organizationId());
-      if (this.listId() === -1) {
-        this.$router.replace(`/organizations/${this.organizationId()}/lists/${this.organizationLists[0].id}`);
-      }
     } else if (this.organizations.length > 0) {
       this.$router.replace(`/organizations/${this.organizations[0].id}`);
     }

@@ -12,6 +12,7 @@ export default new Vuex.Store({
     users: [],
     organizations: [],
     organizationMembers: [],
+    currentUserId: -1,
   },
   getters: {
     tasks(state) {
@@ -64,6 +65,14 @@ export default new Vuex.Store({
         if (!user) return {};
         return user;
       };
+    },
+    currentUser(state) {
+      if (!state.organizationMembers || !Array.isArray(state.organizationMembers)) {
+        return {};
+      }
+      const user = state.organizationMembers.find(u => u.id === state.currentUserId);
+      if (!user) return {};
+      return user;
     },
     organizations(state) {
       Vue.set(state, 'organizations', state.organizations || []);
@@ -132,6 +141,9 @@ export default new Vuex.Store({
     },
   },
   mutations: {
+    SET_CURRENT_USER_ID(state, userId) {
+      Vue.set(state, 'currentUserId', parseInt(userId, 10));
+    },
     SET_TASKS(state, tasks = []) {
       Vue.set(state, 'tasks', tasks);
     },
@@ -468,6 +480,38 @@ export default new Vuex.Store({
     async GET_ORGANIZATION_MEMBERS({ commit }, organizationId) {
       try {
         const { data } = await Vue.API.get(`organizations/${organizationId}/members`);
+        commit('SET_ORGANIZATION_MEMBERS', data.members);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async SET_ORGANIZATION_MEMBERS_ROLE({ commit }, { organizationId, userIds, roleId }) {
+      try {
+        const { data } = await Vue.API.put(`organizations/${organizationId}/members/role`, {
+          user_ids: userIds,
+          role_id: roleId,
+        });
+        commit('ADD_ORGANIZATION_MEMBERS', data.members);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async ADD_ORGANIZATION_MEMBERS({ commit }, { organizationId, userIds, roleId }) {
+      try {
+        const { data } = await Vue.API.put(`organizations/${organizationId}/members`, {
+          user_ids: userIds,
+          role_id: roleId,
+        });
+        commit('SET_ORGANIZATION_MEMBERS', data.members);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async REMOVE_ORGANIZATION_MEMBERS({ commit }, { organizationId, userIds }) {
+      try {
+        const { data } = await Vue.API.delete(`organizations/${organizationId}/members`, {
+          user_ids: userIds,
+        });
         commit('SET_ORGANIZATION_MEMBERS', data.members);
       } catch (e) {
         console.log(e);

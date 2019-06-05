@@ -70,6 +70,10 @@ export default class Api {
     window.location.pathname = this.loginURL;
   }
 
+  getUserId() {
+    return Vue.cookies.get('user_id');
+  }
+
   async login(data = {}) {
     try {
       const localData = {
@@ -82,6 +86,7 @@ export default class Api {
         cancelToken: Api.cancelToken.token,
       });
       Vue.cookies.set('access_token', response.data.access_token, 60 * 60 * 24 * 365);
+      Vue.cookies.set('user_id', response.data.user_id, 60 * 60 * 24 * 365);
       this.goToMainURL();
     } catch (e) {
       if (!axios.isCancel(e)) throw e;
