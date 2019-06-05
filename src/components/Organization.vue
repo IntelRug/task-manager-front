@@ -211,7 +211,7 @@ export default {
     closeNewMembers() {
       setTimeout(() => {
         this.chooseNewMembersFocused = false;
-      }, 100);
+      }, 300);
     },
     toggleRoles() {
       this.openedRoles = !this.openedRoles;
