@@ -23,8 +23,9 @@
             </span>
           </div>
           <div v-if="organizationId() === o.id" class="left-menu__block-item__lists">
-            <div class="left-menu__block-item__list-create"
-                 v-on:click="$store.dispatch('CREATE_ORGANIZATION_LIST')">
+            <div v-if="currentUser.settings && currentUser.settings.role_id <= 1"
+                 class="left-menu__block-item__list-create"
+                 v-on:click="createList">
               <div class="left-menu__block-item__list-text">Создать новый список</div>
               <div class="left-menu__block-item__list-icons">
                 <i class="fas fa-plus"></i>
@@ -96,7 +97,7 @@ export default {
     next();
   },
   computed: {
-    ...mapGetters(['organizations', 'organizationLists', 'organizationList']),
+    ...mapGetters(['currentUser', 'organizations', 'organizationLists', 'organizationList']),
     organizationId() {
       return paramInt('organizationId', this.$route.params);
     },
@@ -108,11 +109,15 @@ export default {
     await this.$store.dispatch('GET_ORGANIZATIONS');
     if (this.organizationId() !== -1) {
       await this.$store.dispatch('GET_ORGANIZATION_LISTS', this.organizationId());
+      await this.$store.dispatch('GET_ORGANIZATION_MEMBERS', this.organizationId());
     } else if (this.organizations.length > 0) {
       this.$router.replace(`/organizations/${this.organizations[0].id}`);
     }
   },
   methods: {
+    createList() {
+      this.$store.dispatch('CREATE_ORGANIZATION_LIST', this.organizationId());
+    },
     async removeList(id) {
       const { positive, moveTo } = await this.$confirm('delete-list', {
         id,
