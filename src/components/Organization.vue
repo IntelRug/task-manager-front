@@ -228,7 +228,7 @@ export default {
       });
     },
     openRolesOnUser(userId) {
-      if (this.canAccessUser) {
+      if (this.canAccessUser(this.organizationMember(userId))) {
         this.openedRolesId = this.openedRolesId === userId ? -1 : userId;
       }
     },
