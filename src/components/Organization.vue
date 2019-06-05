@@ -165,7 +165,7 @@ export default {
     this.$store.dispatch('GET_ORGANIZATION_MEMBERS', this.organizationId());
   },
   computed: {
-    ...mapGetters(['users', 'user', 'organizationMembers', 'currentUser']),
+    ...mapGetters(['users', 'user', 'organizationMember', 'organizationMembers', 'currentUser']),
     organizationId() {
       return paramInt('organizationId', this.$route.params);
     },
